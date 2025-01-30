@@ -13,6 +13,7 @@ class Game:
     def run(self):
         while self.running:
             #dt
+
             dt = self.clock.tick() / 1000
 
             #event loop
