@@ -2,6 +2,7 @@ from settings import *
 from map import Map
 
 pygame.init()
+pygame.display.set_caption('Endless struggle')
 size = width, height
 screen = pygame.display.set_mode(size)
 
