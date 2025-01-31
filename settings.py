@@ -1,6 +1,9 @@
 import pygame
 from os.path import join
 from os import walk
+import os
+import sys
 
-WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
+
+width, height = 1200, 720
 TILE_SIZE = 64
