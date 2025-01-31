@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     all_sprites = pygame.sprite.Group()
 
-    card = Map('Map.tmx')
+    card = Map('Map2.tmx')
     Main_Person = Person(all_sprites)
     while running:  # главный игровой цикл
         for event in pygame.event.get():
