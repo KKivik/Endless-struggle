@@ -8,6 +8,25 @@ pygame.display.set_caption('Endless struggle')
 size = width, height
 screen = pygame.display.set_mode(size)
 
+def load_image(name, colorkey=None):
+    fullname = f'data/{name}'
+
+    # Если файл не существует, то выходим
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+
+    image = pygame.image.load(fullname)
+    if colorkey is None:
+        image = image.convert_alpha()
+    else:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+
+    return image
+
 class AnimatedSprite:
     def __init__(self, sprite_sheet, columns, rows):
         self.frames = []
@@ -50,7 +69,42 @@ class Person(pygame.sprite.Sprite):
         self.animation.update()
         self.image = self.animation.get_current_frame()
 
+def start_screen():
+
+    background = pygame.transform.scale(load_image('background.jpg'),size)
+    screen.blit(background, (0, 0))
+
+    clock = pygame.time.Clock()
+    choice = 1
+    while True:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RETURN and choice == 1:
+                    return
+                elif e.key == pygame.K_DOWN and choice == 1:
+                    choice += 1
+                    background = pygame.transform.scale(load_image('background1.jpg'), size)
+                    screen.blit(background, (0, 0))
+                elif e.key == pygame.K_DOWN and choice == 2:
+                    choice += 1
+                    background = pygame.transform.scale(load_image('background2.jpg'), size)
+                    screen.blit(background, (0, 0))
+                elif e.key == pygame.K_UP and choice == 3:
+                    choice -= 1
+                    background = pygame.transform.scale(load_image('background1.jpg'), size)
+                    screen.blit(background, (0, 0))
+                elif e.key == pygame.K_UP and choice == 2:
+                    choice -= 1
+                    background = pygame.transform.scale(load_image('background.jpg'), size)
+                    screen.blit(background, (0, 0))
+        pygame.display.flip()
+        clock.tick(50)
+
 if __name__ == '__main__':
+    start_screen()
     fps = 50  # Кадр/с
     clock = pygame.time.Clock()
     running = True
