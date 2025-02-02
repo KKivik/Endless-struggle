@@ -1,5 +1,6 @@
 from settings import *
 from map import Map
+from camera import Camera
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -31,9 +32,8 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
 
-    all_sprites = pygame.sprite.Group()
-
-    card = Map('Map2.tmx')
+    map = Map('Map2.tmx')
+    all_sprites = Camera(map)
     Main_Person = Person(all_sprites)
     while running:  # главный игровой цикл
         for event in pygame.event.get():
@@ -42,8 +42,8 @@ if __name__ == '__main__':
 
 
         screen.fill((0, 0, 0))
-        card.render(screen)
-        all_sprites.draw(screen)
+        map.render(screen)
+        all_sprites.custom_draw()
         all_sprites.update()
         pygame.display.flip()
         clock.tick(fps)
