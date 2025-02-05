@@ -141,7 +141,7 @@ if __name__ == '__main__':
             cam.apply(sprite)
         cam.move_map()
 
-
+        Main_Person.update()
         map.render()
         all_sprites.draw(screen)
         pygame.display.flip()
