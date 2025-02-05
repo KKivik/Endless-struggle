@@ -137,7 +137,9 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
 
         cam.update(Main_Person)
+
         Main_Person.update()
+
         for sprite in all_sprites:
             cam.apply(sprite)
         cam.move_map()
