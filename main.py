@@ -3,6 +3,7 @@ from map import Map
 
 from camera import Camera
 
+from enemy import Enemy, AnimatedSpriteEnemy, Enemies
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -119,6 +120,17 @@ if __name__ == '__main__':
     sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
     Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
 
+    # enemy_all_sprites = pygame.sprite.Group()
+    enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
+    # Enemy_Main = Enemy(enemy_sprite_sheet, columns=4, rows=1, groups=enemy_all_sprites)
+    # Enemy_Main = Enemy(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
+    All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
+    All_Enemies.spawn()
+    All_Enemies.spawn()
+    All_Enemies.spawn()
+    All_Enemies.spawn()
+
+    
     while running:  # Главный игровой цикл
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -127,12 +139,16 @@ if __name__ == '__main__':
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             Main_Person.rect.x -= 5
+            # Enemy_Main.rect.x += 1
         if keys[pygame.K_RIGHT]:
             Main_Person.rect.x += 5
+            # Enemy_Main.rect.x -= 1
         if keys[pygame.K_UP]:
             Main_Person.rect.y -= 5
+            # Enemy_Main.rect.y += 1
         if keys[pygame.K_DOWN]:
             Main_Person.rect.y += 5
+            # Enemy_Main.rect.y -= 1
 
         screen.fill((0, 0, 0))
 
@@ -145,6 +161,17 @@ if __name__ == '__main__':
 
         map.render()
         all_sprites.draw(screen)
+
+        # Enemy_Main.update()
+        # print(Enemy_Main.get_cords())
+        All_Enemies.update()
+
+        # enemy_all_sprites.draw(screen)
+        # enemy_all_sprites.update()
+
+
+
+
         pygame.display.flip()
         clock.tick(fps)
 
