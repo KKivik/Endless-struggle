@@ -1,7 +1,8 @@
 from settings import *
 from map import Map
-import pygame
-import os
+
+from camera import Camera
+
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -103,6 +104,8 @@ def start_screen():
         pygame.display.flip()
         clock.tick(50)
 
+    
+        
 if __name__ == '__main__':
     start_screen()
     fps = 50  # Кадр/с
@@ -110,7 +113,9 @@ if __name__ == '__main__':
     running = True
     all_sprites = pygame.sprite.Group()
 
-    card = Map('Map2.tmx')
+    map = Map('Map2.tmx')
+    cam = Camera(map)
+    
     sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
     Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
 
@@ -119,10 +124,27 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
 
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            Main_Person.rect.x -= 5
+        if keys[pygame.K_RIGHT]:
+            Main_Person.rect.x += 5
+        if keys[pygame.K_UP]:
+            Main_Person.rect.y -= 5
+        if keys[pygame.K_DOWN]:
+            Main_Person.rect.y += 5
+
         screen.fill((0, 0, 0))
-        card.render(screen)
+
+        cam.update(Main_Person)
+        Main_Person.update()
+        for sprite in all_sprites:
+            cam.apply(sprite)
+        cam.move_map()
+
+
+        map.render()
         all_sprites.draw(screen)
-        all_sprites.update()
         pygame.display.flip()
         clock.tick(fps)
 
