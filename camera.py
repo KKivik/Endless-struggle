@@ -1,22 +1,23 @@
 from settings import *
-class Camera(pygame.sprite.Group):
+
+
+class Camera:
+    # зададим начальный сдвиг камеры
     def __init__(self, map):
-        super().__init__()
-        self.display_surfsce = pygame.display.get_surface()
-        #camera offset
-        self.offset = pygame.math.Vector2(50, 10)
+        self.dx = 0
+        self.dy = 0
         self.map = map
-        self.map_rect = self.map.get_rect()
-        self.half_w = self.display_surfsce.get_width()
-        self.half_h = self.display_surfsce.get_height()
 
-    def center_camera(self,target):
-        self.offset.x = target.rect.x - self.half_w
-        self.offset.y = target.rect.y - self.half_h
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
 
-    def custom_draw(self):
-        map_offset = self.map_rect + self.offset
-        self.map.render(map_offset)
-        for sprite in self.sprites():
-            offset_pos = sprite.rect.topleft
-            self.display_surfsce.blit(sprite.image, offset_pos)
+    def move_map(self):
+        self.map.offset[0] += self.dx
+        self.map.offset[1] += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
