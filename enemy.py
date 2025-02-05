@@ -1,5 +1,6 @@
 from settings import *
 
+# AnimatedSprite class for Enemy class (probably has no sense)
 class AnimatedSpriteEnemy:
     def __init__(self, sprite_sheet, columns, rows):
         self.frames = []
@@ -28,7 +29,7 @@ class AnimatedSpriteEnemy:
         return self.frames[self.cur_frame]
 
 
-
+# Class of a singular enemy (In game cycle we manage it in Enemies class)
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet, columns, rows, groups):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
@@ -37,13 +38,6 @@ class Enemy(pygame.sprite.Sprite):
         self.animation = AnimatedSpriteEnemy(sprite_sheet, columns, rows)
         self.image = self.animation.get_current_frame()
         self.rect = self.image.get_rect()
-        # self.rect.x = width // 2 - 35
-        # self.rect.y = height // 2 - 35
-        # self.main_person = main_person
-        # self.main_person_cords = self.main_person.image.get_rect()
-        # self.rect.x = width // 2 - 150
-        # self.rect.y = height // 2 - 150
-        
 
         #SPAWNING ENEMY ON RANDOM PLACE AT WINDOW
         # self.rect.x = random.choice(range(1, width))
@@ -70,8 +64,6 @@ class Enemy(pygame.sprite.Sprite):
             if top_or_low == "low":
                 self.rect.x = width + 10
                 self.rect.y = random.choice(range(1, height))
-        # self.rect.x = random.choice(range(1, width))
-        # self.rect.y = random.choice(range(1, height))
 
     def update(self):
         self.animation.update()
@@ -90,11 +82,12 @@ class Enemy(pygame.sprite.Sprite):
                    self.rect.y -= 2
             elif self.rect.y < height // 2 - 35:
                    self.rect.y += 2
-        # # # if self.rect.x > 
+
+    # Returns cords of the enemy
     def get_cords(self):
         return self.rect.x, self.rect.y
 
-
+# Class that manages every Enemy 
 class Enemies():
     def __init__(self, sprite_sheet, columns, rows, groups):
         self.sprite_sheet = sprite_sheet
@@ -106,27 +99,35 @@ class Enemies():
 
         self.all_enemy_list = [] #list of every enemy
 
-
+    # Spawns an enemy (on a random cords cuz of Enemy.init())
     def spawn(self):
         new_enemy = Enemy(self.sprite_sheet, self.columns, self.rows, self.groups)
-        print(new_enemy.get_cords())
         self.all_enemy_list.append(new_enemy)
-    
-        
+
+    # Gives back the nearest Enemy (we can get cords from Enemy's method)          
     def nearest_enemy(self):
-        pass
-        
+        nearest_list = []
+        for current_enemy in self.all_enemy_list:
+            cords_x, cords_y = current_enemy.get_cords()
+            distance = (self.center_of_screen[0] - cords_x) **2 + (self.center_of_screen[1] - cords_y)**2
+            nearest_list.append([distance, current_enemy])
+        if nearest_list:
+            return sorted(nearest_list)[0][1]
+        else:
+            return "Empty list of enemies", "123"
+    
+    # Updates every enemy
     def update(self):
         for current_enemy in self.all_enemy_list:
             current_enemy.update()
 
+    # Sets the spawn speed
     def set_spawn_rate(self):
-        self.animation_speed = 1000  # Скорость анимации
+        self.animation_speed = 1000  # Speed of spawning
         self.last_update = pygame.time.get_ticks()
         
-        
+    # Makes enemies spawning on a constant time gap
     def spawning(self):
-        
         now = pygame.time.get_ticks()
         if now - self.last_update > self.animation_speed:
             self.spawn()
