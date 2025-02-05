@@ -42,7 +42,6 @@ if __name__ == '__main__':
 
 
         screen.fill((0, 0, 0))
-        map.render(screen)
         all_sprites.custom_draw()
         all_sprites.update()
         pygame.display.flip()

@@ -20,4 +20,5 @@ class Map:
         return self.map.tiledgidmap(self.map.get_tile_gid(*position, 0))
 
     def get_rect(self):
+        print(self.topleft)
         return self.topleft
