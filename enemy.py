@@ -51,8 +51,27 @@ class Enemy(pygame.sprite.Sprite):
 
 
         # SPAWNING ENEMY OUT OF WINDOW
-        self.rect.x = random.choice(range(1, width))
-        self.rect.y = random.choice(range(1, height))
+        ver_or_hor = random.choice(("vertical", "horizontal"))
+        top_or_low = random.choice(("top", "low"))
+        if ver_or_hor == "vertical":
+            if top_or_low == "top":
+                self.rect.x = random.choice(range(1, width))
+                self.rect.y = -10
+
+            if top_or_low == "low":
+                self.rect.x = random.choice(range(1, width))
+                self.rect.y = height + 10
+
+        if ver_or_hor == "horizontal":
+            if top_or_low == "top":
+                self.rect.x = -10
+                self.rect.y = random.choice(range(1, height))
+
+            if top_or_low == "low":
+                self.rect.x = width + 10
+                self.rect.y = random.choice(range(1, height))
+        # self.rect.x = random.choice(range(1, width))
+        # self.rect.y = random.choice(range(1, height))
 
     def update(self):
         self.animation.update()
@@ -86,11 +105,13 @@ class Enemies():
         self.center_of_screen = (width // 2 - 35, height // 2 - 35)
 
         self.all_enemy_list = [] #list of every enemy
+
+
     def spawn(self):
         new_enemy = Enemy(self.sprite_sheet, self.columns, self.rows, self.groups)
         print(new_enemy.get_cords())
         self.all_enemy_list.append(new_enemy)
-
+    
         
     def nearest_enemy(self):
         pass
