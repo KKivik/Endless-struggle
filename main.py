@@ -125,12 +125,12 @@ if __name__ == '__main__':
     # Enemy_Main = Enemy(enemy_sprite_sheet, columns=4, rows=1, groups=enemy_all_sprites)
     # Enemy_Main = Enemy(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
     All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
-    All_Enemies.spawn()
-    All_Enemies.spawn()
-    All_Enemies.spawn()
-    All_Enemies.spawn()
+    # All_Enemies.spawn()
+    # All_Enemies.spawn()
+    # All_Enemies.spawn()
+    # All_Enemies.spawn()
+    All_Enemies.set_spawn_rate()
 
-    
     while running:  # Главный игровой цикл
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -164,6 +164,7 @@ if __name__ == '__main__':
 
         # Enemy_Main.update()
         # print(Enemy_Main.get_cords())
+        All_Enemies.spawning()
         All_Enemies.update()
 
         # enemy_all_sprites.draw(screen)

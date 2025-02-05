@@ -90,10 +90,23 @@ class Enemies():
         new_enemy = Enemy(self.sprite_sheet, self.columns, self.rows, self.groups)
         print(new_enemy.get_cords())
         self.all_enemy_list.append(new_enemy)
+
+        
     def nearest_enemy(self):
         pass
         
     def update(self):
         for current_enemy in self.all_enemy_list:
             current_enemy.update()
+
+    def set_spawn_rate(self):
+        self.animation_speed = 1000  # Скорость анимации
+        self.last_update = pygame.time.get_ticks()
         
+        
+    def spawning(self):
+        
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.animation_speed:
+            self.spawn()
+            self.last_update = now
