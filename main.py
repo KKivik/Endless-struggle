@@ -1,5 +1,6 @@
 from settings import *
 from map import Map
+from camera import Camera
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -22,8 +23,9 @@ class Person(pygame.sprite.Sprite):
         self.rect.y = height / 2 - 30
         self.sign = 1
 
-    def update(self):
+    def update(self, *args):
         pass
+
 
 if __name__ == '__main__':
     fps = 50  # кадр/с
@@ -31,20 +33,36 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
 
-    all_sprites = pygame.sprite.Group()
+    map = Map('Map2.tmx')
 
-    card = Map('Map2.tmx')
+    cam = Camera(map)
+    all_sprites = pygame.sprite.Group()
     Main_Person = Person(all_sprites)
+
     while running:  # главный игровой цикл
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            Main_Person.rect.x -= 5
+        if keys[pygame.K_RIGHT]:
+            Main_Person.rect.x += 5
+        if keys[pygame.K_UP]:
+            Main_Person.rect.y -= 5
+        if keys[pygame.K_DOWN]:
+            Main_Person.rect.y += 5
 
         screen.fill((0, 0, 0))
-        card.render(screen)
+
+        cam.update(Main_Person)
+        for sprite in all_sprites:
+            cam.apply(sprite)
+        cam.move_map()
+
+
+        map.render()
         all_sprites.draw(screen)
-        all_sprites.update()
         pygame.display.flip()
         clock.tick(fps)
     pygame.quit()
