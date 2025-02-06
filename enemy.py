@@ -51,75 +51,46 @@ class Enemy(pygame.sprite.Sprite):
             if top_or_low == "top":
                 self.rect.x = random.choice(range(1, width))
                 self.rect.y = -10
-
-            if top_or_low == "low":
+            else:
                 self.rect.x = random.choice(range(1, width))
                 self.rect.y = height + 10
-
-        if ver_or_hor == "horizontal":
+        else:
             if top_or_low == "top":
                 self.rect.x = -10
                 self.rect.y = random.choice(range(1, height))
-
-            if top_or_low == "low":
+            else:
                 self.rect.x = width + 10
                 self.rect.y = random.choice(range(1, height))
 
     def update(self):
         self.animation.update()
         self.image = self.animation.get_current_frame()
+        target_x = width // 2 - 35
+        target_y = height // 2 - 35
+        dx = target_x - self.rect.x
+        dy = target_y - self.rect.y
+        distance = (dx ** 2 + dy ** 2) ** 0.5
+        if distance != 0:
+            self.rect.x += int(2 * dx / distance)
+            self.rect.y += int(2 * dy / distance)
 
-        far_x = abs(self.rect.x - (width // 2 - 35))
-        far_y = abs(self.rect.y - (height // 2 - 35))
-        
-        if far_x > far_y:
-            if self.rect.x > width // 2 - 35:
-                self.rect.x -= 2
-            elif self.rect.x < width // 2 - 35:
-                self.rect.x += 2
-        else:
-            if self.rect.y > height // 2 - 35:
-                   self.rect.y -= 2
-            elif self.rect.y < height // 2 - 35:
-                   self.rect.y += 2
 
-    # Returns cords of the enemy
-    def get_cords(self):
-        return self.rect.x, self.rect.y
-
-# Class that manages every Enemy 
-class Enemies():
-    def __init__(self, sprite_sheet, columns, rows, groups):
+class Enemies:
+    def __init__(self, sprite_sheet, columns, rows, target_groups):
         self.sprite_sheet = sprite_sheet
         self.columns = columns
         self.rows = rows
-        self.groups = groups
+        self.target_groups = target_groups
+        self.enemies_group = pygame.sprite.Group()
+        self.center = (width // 2 - 35, height // 2 - 35)
+        self.set_spawn_rate()
 
-        self.center_of_screen = (width // 2 - 35, height // 2 - 35)
-
-        self.all_enemy_list = [] #list of every enemy
-
-    # Spawns an enemy (on a random cords cuz of Enemy.init())
     def spawn(self):
-        new_enemy = Enemy(self.sprite_sheet, self.columns, self.rows, self.groups)
-        self.all_enemy_list.append(new_enemy)
+        groups = self.target_groups + [self.enemies_group]
+        Enemy(self.sprite_sheet, self.columns, self.rows, groups)
 
-    # Gives back the nearest Enemy (we can get cords from Enemy's method)          
-    def nearest_enemy(self):
-        nearest_list = []
-        for current_enemy in self.all_enemy_list:
-            cords_x, cords_y = current_enemy.get_cords()
-            distance = (self.center_of_screen[0] - cords_x) **2 + (self.center_of_screen[1] - cords_y)**2
-            nearest_list.append([distance, current_enemy])
-        if nearest_list:
-            return sorted(nearest_list)[0][1]
-        else:
-            return "Empty list of enemies", "123"
-    
-    # Updates every enemy
     def update(self):
-        for current_enemy in self.all_enemy_list:
-            current_enemy.update()
+        self.enemies_group.update()
 
     # Sets the spawn speed
     def set_spawn_rate(self):
