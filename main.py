@@ -49,6 +49,14 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = width // 2 - 35
         self.rect.y = height // 2 - 35
+        self.health = 100 #health
+
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            print("Main Person is dead!")
+            return True  # Персонаж умер
+        return False  # Персонаж еще жив
 
     def update(self):
         self.animation.update()
@@ -180,6 +188,13 @@ if __name__ == '__main__':
         hits = pygame.sprite.groupcollide(All_Enemies.enemies_group, bullets_group, True, True)
         if hits: # Add plus one to number of dead bodies 
             All_Enemies.add_dead_body()
+
+
+        death = pygame.sprite.spritecollide(Main_Person, All_Enemies.enemies_group, False)
+        if death:  # Если есть коллизия
+            for enemy in death:  # Обрабатываем каждого врага, который столкнулся с персонажем
+                if Main_Person.take_damage(10):  # Персонаж получает урон
+                    running = False  # Остановка игры (или другая логика)
 
 
         all_sprites.draw(screen)
