@@ -1,5 +1,5 @@
 from settings import *
-
+from bullet import Bullet
 
 class Camera:
     # зададим начальный сдвиг камеры
@@ -10,8 +10,13 @@ class Camera:
 
     # сдвинуть объект obj на смещение камеры
     def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
+        if isinstance(obj, Bullet):
+            # Для пуль используем мировые координаты с учетом смещения камеры
+            obj.rect.centerx = obj.world_x + self.dx
+            obj.rect.centery = obj.world_y + self.dy
+        else:
+            obj.rect.x += self.dx
+            obj.rect.y += self.dy
 
     def move_map(self):
         self.map.offset[0] += self.dx
