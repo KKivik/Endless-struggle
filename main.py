@@ -60,7 +60,7 @@ def start_screen():
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.1)
 
-    background = pygame.transform.scale(load_image('background.jpg'),size)
+    background = pygame.transform.scale(load_image('background.png'),size)
     screen.blit(background, (0, 0))
 
     clock = pygame.time.Clock()
@@ -76,24 +76,36 @@ def start_screen():
                     return
                 elif e.key == pygame.K_DOWN and choice == 1:
                     choice += 1
-                    background = pygame.transform.scale(load_image('background1.jpg'), size)
+                    background = pygame.transform.scale(load_image('background1.png'), size)
                     screen.blit(background, (0, 0))
                 elif e.key == pygame.K_DOWN and choice == 2:
                     choice += 1
-                    background = pygame.transform.scale(load_image('background2.jpg'), size)
+                    background = pygame.transform.scale(load_image('background2.png'), size)
                     screen.blit(background, (0, 0))
                 elif e.key == pygame.K_UP and choice == 3:
                     choice -= 1
-                    background = pygame.transform.scale(load_image('background1.jpg'), size)
+                    background = pygame.transform.scale(load_image('background1.png'), size)
                     screen.blit(background, (0, 0))
                 elif e.key == pygame.K_UP and choice == 2:
                     choice -= 1
-                    background = pygame.transform.scale(load_image('background.jpg'), size)
+                    background = pygame.transform.scale(load_image('background.png'), size)
                     screen.blit(background, (0, 0))
         pygame.display.flip()
         clock.tick(50)
 
-    
+def end_screen():
+    FPS = 50
+
+    background = pygame.transform.scale(load_image('end.png'), size)
+    screen.blit(background, (0, 0))
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        pygame.display.flip()
+        clock.tick(FPS)
         
 if __name__ == '__main__':
 
