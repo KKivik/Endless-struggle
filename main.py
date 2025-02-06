@@ -72,6 +72,10 @@ class Person(pygame.sprite.Sprite):
 
 def start_screen():
 
+    pygame.mixer.music.load("data/Menu_music.mp3")  # Укажите путь к файлу
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.7)
+
     background = pygame.transform.scale(load_image('background.jpg'),size)
     screen.blit(background, (0, 0))
 
@@ -84,6 +88,7 @@ def start_screen():
                 sys.exit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_RETURN and choice == 1:
+                    pygame.mixer.music.stop()
                     return
                 elif e.key == pygame.K_DOWN and choice == 1:
                     choice += 1
@@ -107,6 +112,7 @@ def start_screen():
     
         
 if __name__ == '__main__':
+
     start_screen()
     fps = 50  # Кадр/с
     clock = pygame.time.Clock()
@@ -115,6 +121,10 @@ if __name__ == '__main__':
 
     map = Map('Map2.tmx')
     cam = Camera(map)
+
+    pygame.mixer.music.load("data/Main_music.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.2)
     
     sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
     Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
@@ -150,4 +160,5 @@ if __name__ == '__main__':
         pygame.display.flip()
         clock.tick(fps)
 
+    pygame.mixer.music.stop()
     pygame.quit()
