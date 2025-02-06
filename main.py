@@ -96,7 +96,7 @@ def start_screen():
 def end_screen():
     FPS = 50
 
-    background = pygame.transform.scale(load_image('background_end.png'), size)
+    background = pygame.transform.scale(load_image('end.png'), size)
     screen.blit(background, (0, 0))
     clock = pygame.time.Clock()
     while True:
