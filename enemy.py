@@ -84,6 +84,8 @@ class Enemies:
         self.enemies_group = pygame.sprite.Group()
         self.center = (width // 2 - 35, height // 2 - 35)
         self.set_spawn_rate()
+        self.number_of_killed_enemies = 0
+
 
     def spawn(self):
         groups = self.target_groups + [self.enemies_group]
@@ -103,3 +105,23 @@ class Enemies:
         if now - self.last_update > self.animation_speed:
             self.spawn()
             self.last_update = now
+
+        # Gives back the nearest Enemy (we can get cords from Enemy's method)          
+    def nearest_enemy(self):
+        nearest_list = []
+        for current_enemy in self.all_enemy_list:
+            cords_x, cords_y = current_enemy.get_cords()
+            distance = (self.center_of_screen[0] - cords_x) **2 + (self.center_of_screen[1] - cords_y)**2
+            nearest_list.append([distance, current_enemy])
+        if nearest_list:
+            # return sorted(nearest_list)[0][1]
+            return sorted(nearest_list, key=lambda x: x[0])[0][1]
+        else:
+            return "Empty list of enemies", "123"
+
+    def number_of_killed(self):
+        return self.number_of_killed_enemies
+
+    def add_dead_body(self):
+        self.number_of_killed_enemies += 1
+

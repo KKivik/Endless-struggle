@@ -166,6 +166,9 @@ if __name__ == '__main__':
         bullets_group.update()
 
         hits = pygame.sprite.groupcollide(All_Enemies.enemies_group, bullets_group, True, True)
+        if hits: # Add plus one to number of dead bodies 
+            All_Enemies.add_dead_body()
+
 
         all_sprites.draw(screen)
         pygame.display.flip()
