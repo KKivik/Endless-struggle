@@ -3,6 +3,7 @@ from map import Map
 
 from camera import Camera
 
+from enemy import Enemy, AnimatedSpriteEnemy, Enemies
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -72,6 +73,10 @@ class Person(pygame.sprite.Sprite):
 
 def start_screen():
 
+    pygame.mixer.music.load("data/Menu_music.mp3")  # Укажите путь к файлу
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.7)
+
     background = pygame.transform.scale(load_image('background.jpg'),size)
     screen.blit(background, (0, 0))
 
@@ -84,6 +89,7 @@ def start_screen():
                 sys.exit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_RETURN and choice == 1:
+                    pygame.mixer.music.stop()
                     return
                 elif e.key == pygame.K_DOWN and choice == 1:
                     choice += 1
@@ -107,6 +113,7 @@ def start_screen():
     
         
 if __name__ == '__main__':
+
     start_screen()
     fps = 50  # Кадр/с
     clock = pygame.time.Clock()
@@ -115,9 +122,22 @@ if __name__ == '__main__':
 
     map = Map('Map2.tmx')
     cam = Camera(map)
+
+    pygame.mixer.music.load("data/Main_music.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.2)
     
     sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
     Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
+
+    # Upload the Enemy image
+    enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
+
+    # Creates the class that manages all enemies
+    All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
+
+    # Sets spawn rate
+    All_Enemies.set_spawn_rate()
 
     while running:  # Главный игровой цикл
         for event in pygame.event.get():
@@ -127,17 +147,23 @@ if __name__ == '__main__':
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             Main_Person.rect.x -= 5
+
         if keys[pygame.K_RIGHT]:
             Main_Person.rect.x += 5
+
         if keys[pygame.K_UP]:
             Main_Person.rect.y -= 5
+
         if keys[pygame.K_DOWN]:
             Main_Person.rect.y += 5
+
 
         screen.fill((0, 0, 0))
 
         cam.update(Main_Person)
+
         Main_Person.update()
+
         for sprite in all_sprites:
             cam.apply(sprite)
         cam.move_map()
@@ -145,7 +171,14 @@ if __name__ == '__main__':
         Main_Person.update()
         map.render()
         all_sprites.draw(screen)
+
+        #All enemies managing
+        All_Enemies.spawning()
+        All_Enemies.update()
+
+
         pygame.display.flip()
         clock.tick(fps)
 
+    pygame.mixer.music.stop()
     pygame.quit()
