@@ -1,6 +1,8 @@
 from settings import *
 from map import Map
 
+from bullet import Bullet
+
 from camera import Camera
 
 from enemy import Enemy, AnimatedSpriteEnemy, Enemies
@@ -9,25 +11,6 @@ pygame.init()
 pygame.display.set_caption('Endless struggle')
 size = width, height
 screen = pygame.display.set_mode(size)
-
-def load_image(name, colorkey=None):
-    fullname = f'data/{name}'
-
-    # Если файл не существует, то выходим
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-
-    image = pygame.image.load(fullname)
-    if colorkey is None:
-        image = image.convert_alpha()
-    else:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-
-    return image
 
 class AnimatedSprite:
     def __init__(self, sprite_sheet, columns, rows):
@@ -75,7 +58,7 @@ def start_screen():
 
     pygame.mixer.music.load("data/Menu_music.mp3")  # Укажите путь к файлу
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.7)
+    pygame.mixer.music.set_volume(0.1)
 
     background = pygame.transform.scale(load_image('background.jpg'),size)
     screen.blit(background, (0, 0))
@@ -119,13 +102,14 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
     all_sprites = pygame.sprite.Group()
+    bullets_group = pygame.sprite.Group()
 
     map = Map('Map2.tmx')
     cam = Camera(map)
 
     pygame.mixer.music.load("data/Main_music.mp3")
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.set_volume(0.1)
     
     sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
     Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
@@ -134,7 +118,7 @@ if __name__ == '__main__':
     enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
 
     # Creates the class that manages all enemies
-    All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, groups=all_sprites)
+    All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, target_groups=[all_sprites])
 
     # Sets spawn rate
     All_Enemies.set_spawn_rate()
@@ -143,6 +127,11 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    player_center = Main_Person.rect.center
+                    mouse_pos = pygame.mouse.get_pos()
+                    Bullet(player_center, mouse_pos, [all_sprites, bullets_group])
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -170,13 +159,15 @@ if __name__ == '__main__':
 
         Main_Person.update()
         map.render()
-        all_sprites.draw(screen)
 
         #All enemies managing
         All_Enemies.spawning()
         All_Enemies.update()
+        bullets_group.update()
 
+        hits = pygame.sprite.groupcollide(All_Enemies.enemies_group, bullets_group, True, True)
 
+        all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(fps)
 
