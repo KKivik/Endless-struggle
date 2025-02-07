@@ -202,4 +202,5 @@ if __name__ == '__main__':
         clock.tick(fps)
 
     pygame.mixer.music.stop()
+    end_screen()
     pygame.quit()
