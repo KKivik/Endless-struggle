@@ -96,7 +96,7 @@ class Enemies:
 
     # Sets the spawn speed
     def set_spawn_rate(self):
-        self.animation_speed = 1000  # Speed of spawning
+        self.animation_speed = 200  # Speed of spawning
         self.last_update = pygame.time.get_ticks()
         
     # Makes enemies spawning on a constant time gap

@@ -1,11 +1,9 @@
 from settings import *
 from map import Map
-
 from bullet import Bullet
-
 from camera import Camera
-
 from enemy import Enemy, AnimatedSpriteEnemy, Enemies
+from labels import Label_for_txt
 
 pygame.init()
 pygame.display.set_caption('Endless struggle')
@@ -115,12 +113,19 @@ def start_screen():
         pygame.display.flip()
         clock.tick(50)
 
-def end_screen():
+def end_screen(all_enemies):
     FPS = 50
 
     background = pygame.transform.scale(load_image('end.png'), size)
     screen.blit(background, (0, 0))
     clock = pygame.time.Clock()
+
+    text_color = (255, 0, 0)
+    text = pygame.font.Font(None, 40).render(f'{all_enemies.number_of_killed_enemies}', True, text_color)
+    text_rect = text.get_rect()
+    text_rect.x = 230
+    text_rect.y = 335
+    screen.blit(text, text_rect)
 
     pygame.mixer.music.load("data/Death_musik.mp3")
     pygame.mixer.music.play(-1)
@@ -134,9 +139,10 @@ def end_screen():
                 if e.key == pygame.K_RETURN:
                     pygame.mixer.music.stop()
                     start_screen()
+        screen.blit(text, text_rect)
         pygame.display.flip()
         clock.tick(FPS)
-        
+
 
 def game():
     fps = 50  # Кадр/с
@@ -144,6 +150,8 @@ def game():
     running = True
     all_sprites = pygame.sprite.Group()
     bullets_group = pygame.sprite.Group()
+
+    Label_kill = Label_for_txt(screen)
 
     map = Map('Map2.tmx')
     cam = Camera(map)
@@ -229,11 +237,13 @@ def game():
             for enemy in death:  # Обрабатываем каждого врага, который столкнулся с персонажем
                 if Main_Person.take_damage(10):  # Персонаж получает урон
                     pygame.mixer.music.stop()
-                    end_screen()
+                    end_screen(All_Enemies)
                     running = False  # Остановка игры (или другая логика)
 
 
         all_sprites.draw(screen)
+        Label_kill.draw_button('Killed:', True)
+        Label_kill.draw_button(f'{All_Enemies.number_of_killed_enemies}', False)
         pygame.display.flip()
         clock.tick(fps)
 
