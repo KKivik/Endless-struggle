@@ -40,12 +40,19 @@ class AnimatedSprite:
         return self.frames[self.cur_frame]
 
 class Person(pygame.sprite.Sprite):
-    def __init__(self, sprite_sheet, columns, rows, groups):
+    def __init__(self, idle_sprite_sheet, walk_sprite_sheet, columns_idle, rows_idle, columns_walk, rows_walk, groups):
+        super().__init__(groups)
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
         # Это очень важно!!!
-        super().__init__(groups)
-        self.animation = AnimatedSprite(sprite_sheet, columns, rows)
-        self.image = self.animation.get_current_frame()
+
+        # Анимация стоя
+        self.idle_animation = AnimatedSprite(idle_sprite_sheet, columns_idle, rows_idle)
+        # Анимация ходьбы
+        self.walk_animation = AnimatedSprite(walk_sprite_sheet, columns_walk, rows_walk)
+
+        self.current_animation = self.idle_animation
+
+        self.image = self.current_animation.get_current_frame()
         self.rect = self.image.get_rect()
         self.rect.x = width // 2 - 35
         self.rect.y = height // 2 - 35
@@ -58,9 +65,13 @@ class Person(pygame.sprite.Sprite):
             return True  # Персонаж умер
         return False  # Персонаж еще жив
 
-    def update(self):
-        self.animation.update()
-        self.image = self.animation.get_current_frame()
+    def update(self, moving=False):
+        if moving:
+            self.current_animation = self.walk_animation
+        else:
+            self.current_animation = self.idle_animation
+        self.current_animation.update()
+        self.image = self.current_animation.get_current_frame()
 
 def start_screen():
 
@@ -75,13 +86,16 @@ def start_screen():
     choice = 1
     while True:
         for e in pygame.event.get():
-            if e.type == pygame.QUIT:
+            if e.type == pygame.QUIT or ():
                 pygame.quit()
                 sys.exit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_RETURN and choice == 1:
                     pygame.mixer.music.stop()
-                    return
+                    game()
+                elif e.key == pygame.K_RETURN and choice == 3:
+                    pygame.quit()
+                    sys.exit()
                 elif e.key == pygame.K_DOWN and choice == 1:
                     choice += 1
                     background = pygame.transform.scale(load_image('background1.png'), size)
@@ -107,17 +121,24 @@ def end_screen():
     background = pygame.transform.scale(load_image('end.png'), size)
     screen.blit(background, (0, 0))
     clock = pygame.time.Clock()
+
+    pygame.mixer.music.load("data/Death_musik.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.1)
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RETURN:
+                    pygame.mixer.music.stop()
+                    start_screen()
         pygame.display.flip()
         clock.tick(FPS)
         
-if __name__ == '__main__':
 
-    start_screen()
+def game():
     fps = 50  # Кадр/с
     clock = pygame.time.Clock()
     running = True
@@ -130,9 +151,17 @@ if __name__ == '__main__':
     pygame.mixer.music.load("data/Main_music.mp3")
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.1)
-    
-    sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
-    Main_Person = Person(sprite_sheet, columns=6, rows=1, groups=all_sprites)
+
+    idle_sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
+    walk_sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-walk.png'))
+
+    Main_Person = Person(
+        idle_sprite_sheet=idle_sprite_sheet,
+        walk_sprite_sheet=walk_sprite_sheet,
+        columns_idle=6, rows_idle=1,
+        columns_walk=4, rows_walk=1,
+        groups=all_sprites
+    )
 
     # Upload the Enemy image
     enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
@@ -154,30 +183,35 @@ if __name__ == '__main__':
                     Bullet(player_center, mouse_pos, [all_sprites, bullets_group])
 
         keys = pygame.key.get_pressed()
+        moving = False
+
         if keys[pygame.K_LEFT]:
             Main_Person.rect.x -= 5
+            moving = True
 
         if keys[pygame.K_RIGHT]:
             Main_Person.rect.x += 5
+            moving = True
 
         if keys[pygame.K_UP]:
             Main_Person.rect.y -= 5
+            moving = True
 
         if keys[pygame.K_DOWN]:
             Main_Person.rect.y += 5
+            moving = True
 
 
         screen.fill((0, 0, 0))
 
         cam.update(Main_Person)
 
-        Main_Person.update()
+        Main_Person.update(moving=moving)
 
         for sprite in all_sprites:
             cam.apply(sprite)
-        cam.move_map()
 
-        Main_Person.update()
+        cam.move_map()
         map.render()
 
         #All enemies managing
@@ -186,7 +220,7 @@ if __name__ == '__main__':
         bullets_group.update()
 
         hits = pygame.sprite.groupcollide(All_Enemies.enemies_group, bullets_group, True, True)
-        if hits: # Add plus one to number of dead bodies 
+        if hits: # Add plus one to number of dead bodies
             All_Enemies.add_dead_body()
 
 
@@ -194,6 +228,8 @@ if __name__ == '__main__':
         if death:  # Если есть коллизия
             for enemy in death:  # Обрабатываем каждого врага, который столкнулся с персонажем
                 if Main_Person.take_damage(10):  # Персонаж получает урон
+                    pygame.mixer.music.stop()
+                    end_screen()
                     running = False  # Остановка игры (или другая логика)
 
 
@@ -203,3 +239,6 @@ if __name__ == '__main__':
 
     pygame.mixer.music.stop()
     pygame.quit()
+
+if __name__ == '__main__':
+    start_screen()
