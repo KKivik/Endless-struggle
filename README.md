@@ -1,1 +1,1 @@
-[Endless-Struggle-Skelet-protiv-Skeletov (1).pptx](https://github.com/user-attachments/files/18708455/Endless-Struggle-Skelet-protiv-Skeletov.1.pptx)
+[Endless-Struggle2_without_video.pptx](https://github.com/user-attachments/files/19673242/Endless-Struggle2_without_video.pptx)
