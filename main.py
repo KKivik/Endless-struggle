@@ -160,8 +160,8 @@ def game():
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.1)
 
-    idle_sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-idle.png'))
-    walk_sprite_sheet = pygame.image.load(os.path.join('data', 'skeleton-walk.png'))
+    idle_sprite_sheet = pygame.transform.scale(pygame.image.load(os.path.join('data', 'skeleton-idle.png')), (500, 75))
+    walk_sprite_sheet = pygame.transform.scale(pygame.image.load(os.path.join('data', 'skeleton-walk.png')), (333, 75))
 
     Main_Person = Person(
         idle_sprite_sheet=idle_sprite_sheet,
@@ -172,7 +172,7 @@ def game():
     )
 
     # Upload the Enemy image
-    enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
+    enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (200,67))
 
     # Creates the class that manages all enemies
     All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, target_groups=[all_sprites])
