@@ -153,7 +153,7 @@ def game():
 
     Label_kill = Label_for_txt(screen)
 
-    map = Map('Map2.tmx')
+    map = Map('Map3.tmx')
     cam = Camera(map)
 
     pygame.mixer.music.load("data/Main_music.mp3")

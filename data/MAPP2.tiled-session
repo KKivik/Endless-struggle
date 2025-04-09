@@ -1,0 +1,48 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "Map.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 109,
+                "y": 512
+            }
+        },
+        "Map2.tmx": {
+            "scale": 0.6481770833333332,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 330.92808356769785,
+                "y": 475.1787866613098
+            }
+        },
+        "Map3.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 381,
+                "y": 32
+            }
+        },
+        "overworld_tileset_grass.tsx": {
+            "scaleInDock": 3
+        }
+    },
+    "last.imagePath": "D:/endless_struggle_2/Endless_struggle_2/Endless-struggle/data",
+    "map.height": 32,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 32,
+    "openFiles": [
+    ],
+    "project": "MAPP2.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
