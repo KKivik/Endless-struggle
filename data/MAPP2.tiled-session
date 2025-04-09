@@ -3,8 +3,9 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "assets1.tsx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "Map.tmx": {
@@ -24,15 +25,26 @@
             }
         },
         "Map3.tmx": {
-            "scale": 0.5,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 381,
-                "y": 32
+                "x": 540.25,
+                "y": 529.5
             }
         },
+        "assets1.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 4
+        },
         "overworld_tileset_grass.tsx": {
-            "scaleInDock": 3
+            "scaleInDock": 4,
+            "scaleInEditor": 4
+        },
+        "Трава + земля.tsx": {
+            "scaleInDock": 2
+        },
+        "травка2.tsx": {
+            "scaleInDock": 0.75
         }
     },
     "last.imagePath": "D:/endless_struggle_2/Endless_struggle_2/Endless-struggle/data",
@@ -40,9 +52,19 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 32,
     "openFiles": [
+        "Map3.tmx",
+        "overworld_tileset_grass.tsx",
+        "Map2.tmx",
+        "Map.tmx",
+        "assets1.tsx"
     ],
     "project": "MAPP2.tiled-project",
     "recentFiles": [
+        "Map3.tmx",
+        "overworld_tileset_grass.tsx",
+        "Map2.tmx",
+        "Map.tmx",
+        "assets1.tsx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }
