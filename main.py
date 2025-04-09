@@ -9,6 +9,8 @@ pygame.init()
 pygame.display.set_caption('Endless struggle')
 size = width, height
 screen = pygame.display.set_mode(size)
+vol_of_game = 2
+vol_of_menu = 2
 
 class AnimatedSprite:
     def __init__(self, sprite_sheet, columns, rows):
@@ -72,10 +74,18 @@ class Person(pygame.sprite.Sprite):
         self.image = self.current_animation.get_current_frame()
 
 def start_screen():
-
+    global vol_of_game, vol_of_menu
     pygame.mixer.music.load("data/Menu_music.mp3")  # Укажите путь к файлу
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.1)
+    if vol_of_menu == 0:
+        pygame.mixer.music.set_volume(0)
+    elif vol_of_menu == 1:
+        pygame.mixer.music.set_volume(0.25)
+    elif vol_of_menu == 2:
+        pygame.mixer.music.set_volume(0.5)
+    elif vol_of_menu == 3:
+        pygame.mixer.music.set_volume(1)
+
 
     background = pygame.transform.scale(load_image('background.png'),size)
     screen.blit(background, (0, 0))
@@ -94,6 +104,8 @@ def start_screen():
                 elif e.key == pygame.K_RETURN and choice == 3:
                     pygame.quit()
                     sys.exit()
+                elif e.key == pygame.K_RETURN and choice == 2:
+                    settings()
                 elif e.key == pygame.K_DOWN and choice == 1:
                     choice += 1
                     background = pygame.transform.scale(load_image('background1.png'), size)
@@ -144,7 +156,125 @@ def end_screen(all_enemies):
         clock.tick(FPS)
 
 
+def settings():
+    global vol_of_menu, vol_of_game
+    pygame.mixer.music.load("data/Menu_music.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(vol_of_menu / 4)  # Используем текущую громкость меню
+
+    # Начальное изображение в зависимости от текущих настроек
+    if vol_of_game == 0:
+        background_img = 'es_game_0_fixxed.png'
+    elif vol_of_game == 1:
+        background_img = 'es_game_25_fixxed.png'
+    elif vol_of_game == 2:
+        background_img = 'es_game_50_fixxed.png'
+    elif vol_of_game == 3:
+        background_img = 'es_game_100_fixxed.png'
+
+    background = pygame.transform.scale(load_image(background_img), size)
+    screen.blit(background, (0, 0))
+
+    clock = pygame.time.Clock()
+    choice = 1  # 1 - громкость игры, 2 - громкость меню, 3 - назад
+
+    while True:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_RETURN:
+                    if choice == 1:  # Громкость игры
+                        vol_of_game = (vol_of_game + 1) % 4
+                        if vol_of_game == 0:
+                            background_img = 'es_game_0_fixxed.png'
+                        elif vol_of_game == 1:
+                            background_img = 'es_game_25_fixxed.png'
+                        elif vol_of_game == 2:
+                            background_img = 'es_game_50_fixxed.png'
+                        elif vol_of_game == 3:
+                            background_img = 'es_game_100_fixxed.png'
+                    elif choice == 2:  # Громкость меню
+                        vol_of_menu = (vol_of_menu + 1) % 4
+                        pygame.mixer.music.set_volume(vol_of_menu / 4)
+                        if vol_of_menu == 0:
+                            background_img = 'es_menu_0.png'
+                        elif vol_of_menu == 1:
+                            background_img = 'es_menu_25.png'
+                        elif vol_of_menu == 2:
+                            background_img = 'es_menu_50.png'
+                        elif vol_of_menu == 3:
+                            background_img = 'es_menu_100.png'
+                    elif choice == 3:  # Назад
+                        start_screen()
+                        return
+
+                    # Обновляем фон
+                    background = pygame.transform.scale(load_image(background_img), size)
+                    screen.blit(background, (0, 0))
+
+                elif e.key == pygame.K_DOWN:
+                    choice = min(choice + 1, 3)
+                    # Обновляем изображение для показа выбранного пункта
+                    if choice == 1:
+                        if vol_of_game == 0:
+                            background_img = 'es_game_0_fixxed.png'
+                        elif vol_of_game == 1:
+                            background_img = 'es_game_25_fixxed.png'
+                        elif vol_of_game == 2:
+                            background_img = 'es_game_50_fixxed.png'
+                        elif vol_of_game == 3:
+                            background_img = 'es_game_100_fixxed.png'
+                    elif choice == 2:
+                        if vol_of_menu == 0:
+                            background_img = 'es_menu_0.png'
+                        elif vol_of_menu == 1:
+                            background_img = 'es_menu_25.png'
+                        elif vol_of_menu == 2:
+                            background_img = 'es_menu_50.png'
+                        elif vol_of_menu == 3:
+                            background_img = 'es_menu_100.png'
+                    elif choice == 3:
+                        start_screen()
+                        return
+
+                    background = pygame.transform.scale(load_image(background_img), size)
+                    screen.blit(background, (0, 0))
+
+                elif e.key == pygame.K_UP:
+                    choice = max(choice - 1, 1)
+                    # Аналогично обработке K_DOWN
+                    if choice == 1:
+                        if vol_of_game == 0:
+                            background_img = 'es_game_0_fixxed.png'
+                        elif vol_of_game == 1:
+                            background_img = 'es_game_25_fixxed.png'
+                        elif vol_of_game == 2:
+                            background_img = 'es_game_50_fixxed.png'
+                        elif vol_of_game == 3:
+                            background_img = 'es_game_100_fixxed.png'
+                    elif choice == 2:
+                        if vol_of_menu == 0:
+                            background_img = 'es_menu_0.png'
+                        elif vol_of_menu == 1:
+                            background_img = 'es_menu_25.png'
+                        elif vol_of_menu == 2:
+                            background_img = 'es_menu_50.png'
+                        elif vol_of_menu == 3:
+                            background_img = 'es_menu_100.png'
+                    elif choice == 3:
+                        start_screen()
+                        return
+
+                    background = pygame.transform.scale(load_image(background_img), size)
+                    screen.blit(background, (0, 0))
+
+        pygame.display.flip()
+        clock.tick(50)
+
 def game():
+    global vol_of_game
     fps = 50  # Кадр/с
     clock = pygame.time.Clock()
     running = True
@@ -158,7 +288,14 @@ def game():
 
     pygame.mixer.music.load("data/Main_music.mp3")
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.1)
+    if vol_of_game == 0:
+        pygame.mixer.music.set_volume(0)
+    elif vol_of_game == 1:
+        pygame.mixer.music.set_volume(0.25)
+    elif vol_of_game == 2:
+        pygame.mixer.music.set_volume(0.5)
+    elif vol_of_game == 3:
+        pygame.mixer.music.set_volume(1)
 
     idle_sprite_sheet = pygame.transform.scale(pygame.image.load(os.path.join('data', 'skeleton-idle.png')), (500, 75))
     walk_sprite_sheet = pygame.transform.scale(pygame.image.load(os.path.join('data', 'skeleton-walk.png')), (333, 75))
