@@ -2,7 +2,7 @@ from settings import *
 from map import Map
 from bullet import Bullet
 from camera import Camera
-from enemy import Enemy, AnimatedSpriteEnemy, Enemies
+from enemy import Enemy, ShootingEnemy, AnimatedSpriteEnemy, Enemies
 from labels import Label_for_txt
 
 pygame.init()
@@ -40,30 +40,32 @@ class AnimatedSprite:
 class Person(pygame.sprite.Sprite):
     def __init__(self, idle_sprite_sheet, walk_sprite_sheet, columns_idle, rows_idle, columns_walk, rows_walk, groups):
         super().__init__(groups)
-        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
-        # Это очень важно!!!
-
-        # Анимация стоя
         self.idle_animation = AnimatedSprite(idle_sprite_sheet, columns_idle, rows_idle)
-        # Анимация ходьбы
         self.walk_animation = AnimatedSprite(walk_sprite_sheet, columns_walk, rows_walk)
-
         self.current_animation = self.idle_animation
-
         self.image = self.current_animation.get_current_frame()
         self.rect = self.image.get_rect()
         self.rect.x = width // 2 - 35
         self.rect.y = height // 2 - 35
-        self.health = 100 #health
+        self.health = 100
+        self.invulnerable = False
+        self.invulnerable_timer = 0
 
     def take_damage(self, damage):
-        self.health -= damage
-        if self.health <= 0:
-            print("Main Person is dead!")
-            return True  # Персонаж умер
+        if not self.invulnerable:
+            self.health -= damage
+            self.invulnerable = True
+            self.invulnerable_timer = pygame.time.get_ticks()
+            if self.health <= 0:
+                print("Main Person is dead!")
+                return True  # Персонаж умер
         return False  # Персонаж еще жив
 
     def update(self, moving=False):
+        # Check invulnerability cooldown
+        if self.invulnerable and pygame.time.get_ticks() - self.invulnerable_timer > 1000:  # 1 second invulnerability
+            self.invulnerable = False
+            
         if moving:
             self.current_animation = self.walk_animation
         else:
@@ -72,8 +74,7 @@ class Person(pygame.sprite.Sprite):
         self.image = self.current_animation.get_current_frame()
 
 def start_screen():
-
-    pygame.mixer.music.load("data/Menu_music.mp3")  # Укажите путь к файлу
+    pygame.mixer.music.load("data/Menu_music.mp3")
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.1)
 
@@ -115,7 +116,6 @@ def start_screen():
 
 def end_screen(all_enemies):
     FPS = 50
-
     background = pygame.transform.scale(load_image('end.png'), size)
     screen.blit(background, (0, 0))
     clock = pygame.time.Clock()
@@ -143,13 +143,13 @@ def end_screen(all_enemies):
         pygame.display.flip()
         clock.tick(FPS)
 
-
 def game():
-    fps = 50  # Кадр/с
+    fps = 50
     clock = pygame.time.Clock()
     running = True
     all_sprites = pygame.sprite.Group()
     bullets_group = pygame.sprite.Group()
+    enemy_bullets_group = pygame.sprite.Group()  # Separate group for enemy bullets
 
     Label_kill = Label_for_txt(screen)
 
@@ -171,16 +171,11 @@ def game():
         groups=all_sprites
     )
 
-    # Upload the Enemy image
     enemy_sprite_sheet = pygame.transform.scale(load_image(os.path.join('enemy_idle.png')), (150,50))
-
-    # Creates the class that manages all enemies
     All_Enemies = Enemies(enemy_sprite_sheet, columns=4, rows=1, target_groups=[all_sprites])
-
-    # Sets spawn rate
     All_Enemies.set_spawn_rate()
 
-    while running:  # Главный игровой цикл
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -196,24 +191,18 @@ def game():
         if keys[pygame.K_LEFT]:
             Main_Person.rect.x -= 5
             moving = True
-
         if keys[pygame.K_RIGHT]:
             Main_Person.rect.x += 5
             moving = True
-
         if keys[pygame.K_UP]:
             Main_Person.rect.y -= 5
             moving = True
-
         if keys[pygame.K_DOWN]:
             Main_Person.rect.y += 5
             moving = True
 
-
         screen.fill((0, 0, 0))
-
         cam.update(Main_Person)
-
         Main_Person.update(moving=moving)
 
         for sprite in all_sprites:
@@ -222,24 +211,33 @@ def game():
         cam.move_map()
         map.render()
 
-        #All enemies managing
+        # Update all game objects
         All_Enemies.spawning()
         All_Enemies.update()
         bullets_group.update()
+        enemy_bullets_group.update()
 
+        # Player bullets hitting enemies
         hits = pygame.sprite.groupcollide(All_Enemies.enemies_group, bullets_group, True, True)
-        if hits: # Add plus one to number of dead bodies
+        if hits:
             All_Enemies.add_dead_body()
 
+        # Enemy bullets hitting player
+        enemy_bullet_hits = pygame.sprite.spritecollide(Main_Person, enemy_bullets_group, True)
+        for hit in enemy_bullet_hits:
+            if Main_Person.take_damage(10):
+                pygame.mixer.music.stop()
+                end_screen(All_Enemies)
+                running = False
 
-        death = pygame.sprite.spritecollide(Main_Person, All_Enemies.enemies_group, False)
-        if death:  # Если есть коллизия
-            for enemy in death:  # Обрабатываем каждого врага, который столкнулся с персонажем
-                if Main_Person.take_damage(10):  # Персонаж получает урон
+        # Enemy collision with player
+        enemy_hits = pygame.sprite.spritecollide(Main_Person, All_Enemies.enemies_group, False)
+        if enemy_hits:
+            for enemy in enemy_hits:
+                if Main_Person.take_damage(10):
                     pygame.mixer.music.stop()
                     end_screen(All_Enemies)
-                    running = False  # Остановка игры (или другая логика)
-
+                    running = False
 
         all_sprites.draw(screen)
         Label_kill.draw_button('Killed:', True)

@@ -1,5 +1,7 @@
 from settings import *
-
+import random
+from pygame.math import Vector2
+from bullet import Bullet
 # AnimatedSprite class for Enemy class (probably has no sense)
 class AnimatedSpriteEnemy:
     def __init__(self, sprite_sheet, columns, rows):
@@ -75,6 +77,48 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.y += int(2 * dy / distance)
 
 
+class ShootingEnemy(Enemy):
+    def __init__(self, sprite_sheet, columns, rows, groups):
+        super().__init__(sprite_sheet, columns, rows, groups)
+        self.shoot_cooldown = 150 # time between shots in milliseconds
+        self.last_shot = pygame.time.get_ticks()
+        self.has_started_shooting = False
+        self.bullet_speed = 7
+        self.detection_radius = width // 2  # Half screen distance
+
+
+
+
+    def update(self):
+        super().update()  # Call parent update for movement and animation
+        
+        # Calculate distance to player (center of screen)
+        player_pos = Vector2(width // 2 - 35, height // 2 - 35)
+        enemy_pos = Vector2(self.rect.centerx, self.rect.centery)
+        distance = enemy_pos.distance_to(player_pos)
+        
+        # Check if enemy is within detection radius
+        if distance < self.detection_radius:
+            if not self.has_started_shooting:
+                self.has_started_shooting = True
+            
+            # Shooting logic
+            now = pygame.time.get_ticks()
+            if now - self.last_shot > self.shoot_cooldown:
+                self.last_shot = now
+                self.shoot(player_pos)
+    
+    def shoot(self, target_pos):
+        # Create bullet at enemy's position aiming at target position
+        bullet_groups = [self.bullets_group]  # Add any other groups you need
+        Bullet(
+            start_pos=(self.rect.centerx, self.rect.centery),
+            target_pos=target_pos,
+            groups=bullet_groups
+        )
+
+
+
 class Enemies:
     def __init__(self, sprite_sheet, columns, rows, target_groups):
         self.sprite_sheet = sprite_sheet
@@ -82,17 +126,24 @@ class Enemies:
         self.rows = rows
         self.target_groups = target_groups
         self.enemies_group = pygame.sprite.Group()
+        self.shooting_enemies_group = pygame.sprite.Group()  # New group for shooting enemies
         self.center = (width // 2 - 35, height // 2 - 35)
         self.set_spawn_rate()
         self.number_of_killed_enemies = 0
-
+        self.shooting_enemy_chance = 0.3  # 30% chance to spawn shooting enemy
 
     def spawn(self):
         groups = self.target_groups + [self.enemies_group]
-        Enemy(self.sprite_sheet, self.columns, self.rows, groups)
+        if random.random() < self.shooting_enemy_chance:
+            enemy = ShootingEnemy(self.sprite_sheet, self.columns, self.rows, groups)
+            self.shooting_enemies_group.add(enemy)
+            groups[-1].add(enemy)  # Add to enemies_group as well
+        else:
+            Enemy(self.sprite_sheet, self.columns, self.rows, groups)
 
     def update(self):
         self.enemies_group.update()
+        self.shooting_enemies_group.update()
 
     # Sets the spawn speed
     def set_spawn_rate(self):
